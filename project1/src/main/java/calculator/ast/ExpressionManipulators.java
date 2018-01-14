@@ -36,7 +36,7 @@ public class ExpressionManipulators {
      */
     public static AstNode handleToDouble(Environment env, AstNode node) {
         // To help you get started, we've implemented this method for you.
-        // You should fill in the TODOs in the 'toDoubleHelper' method. lol
+        // You should fill in the TODOs in the 'toDoubleHelper' method. 
         return new AstNode(toDoubleHelper(env.getVariables(), node.getChildren().get(0)));
     }
 
