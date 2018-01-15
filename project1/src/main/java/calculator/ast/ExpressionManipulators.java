@@ -42,17 +42,27 @@ public class ExpressionManipulators {
 
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
         // There are three types of nodes, so we have three cases.
+        
         if (node.isNumber()) {
             // TODO: your code here
-            throw new NotYetImplementedException();
+            return node.getNumericValue();
+            
         } else if (node.isVariable()) {
             // TODO: your code here
-            throw new NotYetImplementedException();
+            if (!variables.containsKey(node.getName())) {
+                throw new EvaluationError("Undefined variable: " + node.getName());
+            }
+            
+            return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
-
             // TODO: your code here
-            throw new NotYetImplementedException();
+            if (!variables.containsKey(name)) {
+                throw new EvaluationError("Unknown operation: " + name);
+            }
+            
+            return toDoubleHelper(variables, node.getChildren().get(0)) +
+                    toDoubleHelper(variables, node.getChildren().get(1));
         }
     }
 
