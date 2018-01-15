@@ -130,8 +130,8 @@ public class ExpressionManipulators {
             if (name.equals("+") || name.equals("*") || name.equals("-")) {
                 if ((node.getChildren().get(0).isNumber() || 
                         variables.containsKey(node.getChildren().get(0).getName())) &&
-                        node.getChildren().get(1).isNumber() || 
-                        variables.containsKey(node.getChildren().get(1).getName())) {
+                        (node.getChildren().get(1).isNumber() || 
+                        variables.containsKey(node.getChildren().get(1).getName()))) {
                     return handleToDouble(env, node);
                 }
             } else if (node.getChildren().size() == 1) {
