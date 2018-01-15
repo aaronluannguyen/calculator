@@ -57,29 +57,30 @@ public class ExpressionManipulators {
         } else {
             String name = node.getName();
             // TODO: your code here
+            
             if (!variables.containsKey(name)) {
                 throw new EvaluationError("Unknown operation: " + name);
-            }
-            
-            if (node.getChildren().size() == 1) {
-                return toDoubleHelper(variables, node.getChildren().get(0));
+            } else if (name.equals("negate")) {
+                return (-1 * toDoubleHelper(variables, node.getChildren().get(0)));
+            } else if (name.equals("sin")) {
+                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+            } else if (name.equals("cos")) {
+                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
+            } else if (name.equals("+")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) +
+                        toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("-")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) -
+                        toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("*")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) *
+                        toDoubleHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("/")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) /
+                        toDoubleHelper(variables, node.getChildren().get(1));
             } else {
-                if (name.equals("+")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) +
-                            toDoubleHelper(variables, node.getChildren().get(1));
-                } else if (name.equals("-")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) -
-                            toDoubleHelper(variables, node.getChildren().get(1));
-                } else if (name.equals("*")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) *
-                            toDoubleHelper(variables, node.getChildren().get(1));
-                } else if (name.equals("/")) {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) /
-                            toDoubleHelper(variables, node.getChildren().get(1));
-                } else {
-                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
-                            toDoubleHelper(variables, node.getChildren().get(1)));
-                }
+                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
+                        toDoubleHelper(variables, node.getChildren().get(1)));
             }
         }
     }
@@ -115,7 +116,15 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        throw new NotYetImplementedException();
+        return new AstNode(toSimplifyHelper(env.getVariables(), node.getChildren().get(0)));
+    }
+    
+    private static double toSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
+        // return toDoubleHelper(variables, node);
+        
+        if (node.getName().equals("+")) {
+            return node.getChildren().get(0) + node.getChildren().get(1);
+        }
     }
 
     /**
