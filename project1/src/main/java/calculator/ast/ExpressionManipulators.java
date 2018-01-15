@@ -115,17 +115,43 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        if (node.getChildren().get(0).isOperation()) {
-            String name = node.getChildren().get(0).getName();
-            if (!name.equals("negate") || !name.equals("^") || !name.equals("/") || !name.equals("cos") || 
-                    !name.equals("sin")) {
-                return handleToDouble(env, node);
-            }
-        }
-        return node.getChildren().get(0);
+        return toSimplifyHelper(env, node.getChildren().get(0));
+        
+        // MY COMMENTS
+        // HANDLETODOUBLE IS GOING TO CHILD 0 AND FUCKING OUR CODE
+        // RETURN THE TOP MOST NODE (SIMPLIFY FUNCTION)
+        // DO ALL SIMPLIFICATION ON CHILD!!
     }
     
-
+    private static AstNode toSimplifyHelper(Environment env, AstNode node) {
+        IDictionary<String, AstNode> variables = env.getVariables();
+        if (node.isOperation()) {
+            String name = node.getName();
+            if (name.equals("+") || name.equals("*") || name.equals("-")) {
+                if ((node.getChildren().get(0).isNumber() || 
+                        variables.containsKey(node.getChildren().get(0).getName())) &&
+                        node.getChildren().get(1).isNumber() || 
+                        variables.containsKey(node.getChildren().get(1).getName())) {
+                    return handleToDouble(env, node);
+                }
+            } else if (node.getChildren().size() == 1) {
+                node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                return node;
+            } else {
+                node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                node.getChildren().set(1, toSimplifyHelper(env, node.getChildren().get(1)));
+                return node;
+            }
+        } else if (node.isNumber()) {
+            return node;
+        } else if (variables.containsKey(node.getName())){
+            return new AstNode(node.getNumericValue());
+        } else {
+            return node;
+        }
+        return null;
+    }
+    
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
      * generates the corresponding plot. Returns some arbitrary AstNode.
