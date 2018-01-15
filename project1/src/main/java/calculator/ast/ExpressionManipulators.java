@@ -61,8 +61,26 @@ public class ExpressionManipulators {
                 throw new EvaluationError("Unknown operation: " + name);
             }
             
-            return toDoubleHelper(variables, node.getChildren().get(0)) +
-                    toDoubleHelper(variables, node.getChildren().get(1));
+            if (node.getChildren().size() == 1) {
+                return toDoubleHelper(variables, node.getChildren().get(0));
+            } else {
+                if (name.equals("+")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) +
+                            toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("-")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) -
+                            toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("*")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) *
+                            toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("/")) {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) /
+                            toDoubleHelper(variables, node.getChildren().get(1));
+                } else {
+                    return toDoubleHelper(variables, node.getChildren().get(0)) +
+                            toDoubleHelper(variables, node.getChildren().get(1));
+                }
+            }
         }
     }
 
