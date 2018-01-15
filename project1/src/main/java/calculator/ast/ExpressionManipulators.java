@@ -125,14 +125,19 @@ public class ExpressionManipulators {
     
     private static AstNode toSimplifyHelper(Environment env, AstNode node) {
         IDictionary<String, AstNode> variables = env.getVariables();
-        if (node.isOperation()) {
+        if (node.isOperation()) { 
             String name = node.getName();
             if (name.equals("+") || name.equals("*") || name.equals("-")) {
                 if ((node.getChildren().get(0).isNumber() || 
                         variables.containsKey(node.getChildren().get(0).getName())) &&
                         (node.getChildren().get(1).isNumber() || 
                         variables.containsKey(node.getChildren().get(1).getName()))) {
-                    return handleToDouble(env, node);
+                    node = new AstNode(toDoubleHelper(variables, node));
+                    return node;
+                } else {
+                    node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                    node.getChildren().set(1, toSimplifyHelper(env, node.getChildren().get(1)));
+                    return node;
                 }
             } else if (node.getChildren().size() == 1) {
                 node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
@@ -146,10 +151,11 @@ public class ExpressionManipulators {
             return node;
         } else if (variables.containsKey(node.getName())){
             return new AstNode(node.getNumericValue());
+            // node = new AstNode(toDoubleHelper(variables, node));
+            // return node;
         } else {
             return node;
         }
-        return null;
     }
     
     /**
