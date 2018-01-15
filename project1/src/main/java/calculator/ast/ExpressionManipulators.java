@@ -52,15 +52,12 @@ public class ExpressionManipulators {
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
-            
             return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
             // TODO: your code here
             
-            if (!variables.containsKey(name)) {
-                throw new EvaluationError("Unknown operation: " + name);
-            } else if (name.equals("negate")) {
+            if (name.equals("negate")) {
                 return (-1 * toDoubleHelper(variables, node.getChildren().get(0)));
             } else if (name.equals("sin")) {
                 return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
@@ -78,9 +75,11 @@ public class ExpressionManipulators {
             } else if (name.equals("/")) {
                 return toDoubleHelper(variables, node.getChildren().get(0)) /
                         toDoubleHelper(variables, node.getChildren().get(1));
-            } else {
+            } else if (name.equals("^")){
                 return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
                         toDoubleHelper(variables, node.getChildren().get(1)));
+            } else {
+                throw new EvaluationError("Unknown operation: " + name);
             }
         }
     }
@@ -116,16 +115,16 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        return new AstNode(toSimplifyHelper(env.getVariables(), node.getChildren().get(0)));
+        if (node.getChildren().get(0).isOperation()) {
+            String name = node.getChildren().get(0).getName();
+            if (!name.equals("negate") || !name.equals("^") || !name.equals("/") || !name.equals("cos") || 
+                    !name.equals("sin")) {
+                return handleToDouble(env, node);
+            }
+        }
+        return node.getChildren().get(0);
     }
     
-    private static double toSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
-        // return toDoubleHelper(variables, node);
-        
-        if (node.getName().equals("+")) {
-            return node.getChildren().get(0) + node.getChildren().get(1);
-        }
-    }
 
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
