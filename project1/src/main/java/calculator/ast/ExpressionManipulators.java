@@ -115,17 +115,23 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        if (node.getChildren().get(0).isOperation()) {
-            String name = node.getChildren().get(0).getName();
-            if (!name.equals("negate") || !name.equals("^") || !name.equals("/") || !name.equals("cos") || 
-                    !name.equals("sin")) {
-                return handleToDouble(env, node);
-            }
-        }
-        return node.getChildren().get(0);
+        return toSimplifyHelper(env.getVariables(), node.getChildren().get(0));
     }
     
-
+    private static AstNode toSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
+        
+        if (node.isOperation()) {
+            String name = node.getName();
+            if (name.equals("negates") || name.equals("^") || name.equals("/") || name.equals("cos")||
+                    name.equals("sin")) {
+                node.getChildren().set(0, toSimplifyHelper(variables, node.getChildren().get(0)));
+                return node;
+            }
+        }
+        return null;
+    }
+    
+    
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
      * generates the corresponding plot. Returns some arbitrary AstNode.
