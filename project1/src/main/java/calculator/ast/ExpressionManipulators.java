@@ -45,7 +45,7 @@ public class ExpressionManipulators {
         
         if (node.isNumber()) {
             // TODO: your code here
-            return node.getNumericValue();
+            return (double) node.getNumericValue();
             
         } else if (node.isVariable()) {
             // TODO: your code here
@@ -57,12 +57,13 @@ public class ExpressionManipulators {
         } else {
             String name = node.getName();
             // TODO: your code here
-            if (!variables.containsKey(name)) {
-                throw new EvaluationError("Unknown operation: " + name);
-            }
-            
-            if (node.getChildren().size() == 1) {
-                return toDoubleHelper(variables, node.getChildren().get(0));
+
+            if (name.equals("negate")) {
+                return (-1 * toDoubleHelper(variables, node.getChildren().get(0)));
+            }else if (name.equals("sin")) {
+                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
+            }else if (name.equals("cos")) {                            
+                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
             } else {
                 if (name.equals("+")) {
                     return toDoubleHelper(variables, node.getChildren().get(0)) +
@@ -76,9 +77,12 @@ public class ExpressionManipulators {
                 } else if (name.equals("/")) {
                     return toDoubleHelper(variables, node.getChildren().get(0)) /
                             toDoubleHelper(variables, node.getChildren().get(1));
-                } else {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) +
-                            toDoubleHelper(variables, node.getChildren().get(1));
+                } else if (name.equals("^")) {
+                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)),
+                            toDoubleHelper(variables, node.getChildren().get(1)));
+                }else {                    
+                        throw new EvaluationError("Unknown operation: " + name);                    
+                    
                 }
             }
         }
@@ -111,11 +115,43 @@ public class ExpressionManipulators {
         // Try writing this one on your own!
         // Hint 1: Your code will likely be structured roughly similarly
         //         to your "handleToDouble" method
+        return new AstNode(toSimplifyHelper(env.getVariables(), node.getChildren().get(0)));
         // Hint 2: When you're implementing constant folding, you may want
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        throw new NotYetImplementedException();
+//        throw new NotYetImplementedException();
+    }
+    
+    private static double toSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
+        if (node.isNumber()) {
+            // TODO: your code here
+            return node.getNumericValue();
+            
+        } else if (node.isVariable()) {
+            // TODO: your code here
+            if (!variables.containsKey(node.getName())) {
+                throw new EvaluationError("Undefined variable: " + node.getName());
+            }
+            
+            return variables.get(node.getName()).getNumericValue();
+        } else {
+            String name = node.getName();
+            // TODO: your code here
+            if (!variables.containsKey(name)) {
+                throw new EvaluationError("Unknown operation: " + name);
+            }                       
+            if (name.equals("+")) {
+                return toSimplifyHelper(variables, node.getChildren().get(0)) +
+                        toSimplifyHelper(variables, node.getChildren().get(1));
+            } else if (name.equals("-")) {
+                return toSimplifyHelper(variables, node.getChildren().get(0)) -
+                        toSimplifyHelper(variables, node.getChildren().get(1));
+            } else {
+                return toSimplifyHelper(variables, node.getChildren().get(0)) *
+                        toSimplifyHelper(variables, node.getChildren().get(1));
+            }
+        }        
     }
 
     /**
