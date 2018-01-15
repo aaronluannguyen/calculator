@@ -77,8 +77,8 @@ public class ExpressionManipulators {
                     return toDoubleHelper(variables, node.getChildren().get(0)) /
                             toDoubleHelper(variables, node.getChildren().get(1));
                 } else {
-                    return toDoubleHelper(variables, node.getChildren().get(0)) +
-                            toDoubleHelper(variables, node.getChildren().get(1));
+                    return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
+                            toDoubleHelper(variables, node.getChildren().get(1)));
                 }
             }
         }
