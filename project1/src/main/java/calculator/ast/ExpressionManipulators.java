@@ -5,7 +5,6 @@ import calculator.errors.EvaluationError;
 import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
-import misc.exceptions.NotYetImplementedException;
 
 /**
  * All of the static methods in this class are given the exact same parameters for
@@ -38,7 +37,6 @@ public class ExpressionManipulators {
      */
     public static AstNode handleToDouble(Environment env, AstNode node) {
         // To help you get started, we've implemented this method for you.
-        // You should fill in the TODOs in the 'toDoubleHelper' method. 
         return new AstNode(toDoubleHelper(env.getVariables(), node.getChildren().get(0)));
     }
 
@@ -46,11 +44,9 @@ public class ExpressionManipulators {
         // There are three types of nodes, so we have three cases.
         
         if (node.isNumber()) {
-            // TODO: your code here
             return node.getNumericValue();
             
         } else if (node.isVariable()) {
-            // TODO: your code here
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
@@ -61,7 +57,6 @@ public class ExpressionManipulators {
             return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
-            // TODO: your code here
             
             if (name.equals("negate")) {
                 return (-1 * toDoubleHelper(variables, node.getChildren().get(0)));
@@ -119,8 +114,6 @@ public class ExpressionManipulators {
         //         to your "handleToDouble" method
         // Hint 2: When you're implementing constant folding, you may want
         //         to call your "handleToDouble" method in some way
-
-        // TODO: Your code here
 
         return toSimplifyHelper(env, node.getChildren().get(0));
     }
@@ -197,15 +190,14 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if step > (max - min)
      */
     public static AstNode plot(Environment env, AstNode node) {
-        // TODO: Your code here
         IDictionary<String, AstNode> variables = env.getVariables();
         AstNode expression = node.getChildren().get(0);
         AstNode var = node.getChildren().get(1);
-        AstNode varMin = node.getChildren().get(2);
-        AstNode varMax = node.getChildren().get(3);
-        AstNode step = node.getChildren().get(4);
+        Double varMin = toDoubleHelper(env.getVariables(), node.getChildren().get(2));
+        Double varMax = toDoubleHelper(env.getVariables(), node.getChildren().get(3));
+        Double step = toDoubleHelper(env.getVariables(), node.getChildren().get(4));
         
-        if (varMin.getNumericValue() > varMax.getNumericValue()) {
+        if (varMin > varMax) {
             throw new EvaluationError("varMin > varMax");
         }
         
@@ -213,21 +205,20 @@ public class ExpressionManipulators {
             throw new EvaluationError("Variable: " + node.getName() + "is already defined");
         }
         
-        if (step.getNumericValue() <= 0) {
+        if (step <= 0) {
             throw new EvaluationError("Step is zero or negative");
         }
         
-        if (step.getNumericValue() > 
-           (varMax.getNumericValue() - varMin.getNumericValue())) {
+        if (step > (varMax - varMin)) {
             throw new EvaluationError("Step > (max - min)");
         }
 
-        DoubleLinkedList<Double> xValues = new DoubleLinkedList<Double>();
-        DoubleLinkedList<Double> yValues = new DoubleLinkedList<Double>();
+        IList<Double> xValues = new DoubleLinkedList<Double>();
+        IList<Double> yValues = new DoubleLinkedList<Double>();
         
-        for (Double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i+= step.getNumericValue()) {
+        for (Double i = varMin; i <= varMax; i+= step) {
             xValues.add(i);
-            variables.put("x", new AstNode(i));
+            variables.put(var.getName(), new AstNode(i));
             yValues.add(toDoubleHelper(variables, expression));
         }
         
