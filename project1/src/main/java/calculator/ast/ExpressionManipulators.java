@@ -2,7 +2,9 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 import calculator.errors.EvaluationError;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
+import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
 
 /**
@@ -123,12 +125,6 @@ public class ExpressionManipulators {
         return toSimplifyHelper(env, node.getChildren().get(0));
     }
     
-
-        // MY COMMENTS
-        // HANDLETODOUBLE IS GOING TO CHILD 0 AND FUCKING OUR CODE
-        // RETURN THE TOP MOST NODE (SIMPLIFY FUNCTION)
-        // DO ALL SIMPLIFICATION ON CHILD!
-    
     private static AstNode toSimplifyHelper(Environment env, AstNode node) {
         IDictionary<String, AstNode> variables = env.getVariables();
         if (node.isOperation()) { 
@@ -198,11 +194,47 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if varMin > varMax
      * @throws EvaluationError  if 'var' was already defined
      * @throws EvaluationError  if 'step' is zero or negative
+     * @throws EvaluationError  if step > (max - min)
      */
     public static AstNode plot(Environment env, AstNode node) {
         // TODO: Your code here
-        throw new NotYetImplementedException();
+        IDictionary<String, AstNode> variables = env.getVariables();
+        AstNode expression = node.getChildren().get(0);
+        AstNode var = node.getChildren().get(1);
+        AstNode varMin = node.getChildren().get(2);
+        AstNode varMax = node.getChildren().get(3);
+        AstNode step = node.getChildren().get(4);
+        
+        if (varMin.getNumericValue() > varMax.getNumericValue()) {
+            throw new EvaluationError("varMin > varMax");
+        }
+        
+        if (env.getVariables().containsKey(var.getName())) {
+            throw new EvaluationError("Variable: " + node.getName() + "is already defined");
+        }
+        
+        if (step.getNumericValue() <= 0) {
+            throw new EvaluationError("Step is zero or negative");
+        }
+        
+        if (step.getNumericValue() > 
+           (varMax.getNumericValue() - varMin.getNumericValue())) {
+            throw new EvaluationError("Step > (max - min)");
+        }
 
+        DoubleLinkedList<Double> xValues = new DoubleLinkedList<Double>();
+        DoubleLinkedList<Double> yValues = new DoubleLinkedList<Double>();
+        
+        for (Double i = varMin.getNumericValue(); i <= varMax.getNumericValue(); i+= step.getNumericValue()) {
+            xValues.add(i);
+            variables.put("x", new AstNode(i));
+            yValues.add(toDoubleHelper(variables, expression));
+        }
+        
+        env.getImageDrawer().drawScatterPlot("Plot", "X-Axis", "Y-Axis", xValues, yValues);
+        
+        variables.remove(var.getName());
+        
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -212,6 +244,6 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-        // return new AstNode(1);
+        return new AstNode(1);
     }
 }
