@@ -2,7 +2,10 @@ package calculator.ast;
 
 import calculator.interpreter.Environment;
 import calculator.errors.EvaluationError;
+import calculator.gui.ImageDrawer;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
+import datastructures.interfaces.IList;
 import misc.exceptions.NotYetImplementedException;
 
 /**
@@ -200,9 +203,41 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'step' is zero or negative
      */
     public static AstNode plot(Environment env, AstNode node) {
-        // TODO: Your code here
-        throw new NotYetImplementedException();
-
+        // TODO: Your code here      
+        IDictionary<String, AstNode> variables = env.getVariables();
+        AstNode expression = node.getChildren().get(0);
+        AstNode var = node.getChildren().get(1);
+        AstNode varMin = node.getChildren().get(2);
+        AstNode varMax = node.getChildren().get(3);
+        AstNode step = node.getChildren().get(4);
+//      if (!variables.containsKey(expression.getName())) {
+//      throw new EvaluationError("Undefined variable " + expression.getName());
+//  }
+        if (varMin.getNumericValue() > varMax.getNumericValue()) {
+            throw new EvaluationError("Minimum value is greater than maximum value");            
+      }
+        if (variables.containsKey(var.getName())) {
+            throw new EvaluationError("Variable " + node.getChildren().get(1).getName() + " already defined");
+        }
+        if (step.getNumericValue() <= 0) {
+            throw new EvaluationError("Step is less than or equal to 0");
+        }
+        if (step.getNumericValue() >= varMax.getNumericValue() - varMin.getNumericValue()) {
+            throw new EvaluationError("Step greater than range");
+        }
+        IList<Double> xValues = new DoubleLinkedList<Double>();
+        IList<Double> yValues = new DoubleLinkedList<Double>();
+        for (Double i = varMin.getNumericValue(); i < varMax.getNumericValue(); i+= step.getNumericValue()) {            
+            xValues.add(i);
+            variables.put(var.getName(), new AstNode(i));
+            yValues.add(toDoubleHelper(variables, expression));
+        }        
+        env.getImageDrawer().drawScatterPlot("Title", "xAxisLabel", "yAxisLabel", xValues, yValues);
+        variables.remove(var.getName());
+//        drawScatterPlot("Plot", "X Axis", "Y Axis", xValues, yValues);
+       
+        
+        
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -212,6 +247,6 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-        // return new AstNode(1);
+        return new AstNode(1);
     }
 }
