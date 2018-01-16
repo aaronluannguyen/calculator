@@ -53,7 +53,7 @@ public class ExpressionManipulators {
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
             
-            if(!variables.get(node.getName()).isNumber()) {
+            if (!variables.get(node.getName()).isNumber()) {
                 return toDoubleHelper(variables, variables.get(node.getName()));
             }
             return variables.get(node.getName()).getNumericValue();
@@ -160,8 +160,6 @@ public class ExpressionManipulators {
                 return toSimplifyHelper(env, variables.get(node.getName()));
             }
             return new AstNode(variables.get(node.getName()).getNumericValue());
-            // node = new AstNode(toDoubleHelper(variables, node));
-            // return node;
         } else {
             return node;
         }
