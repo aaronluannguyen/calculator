@@ -6,6 +6,7 @@ import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.IList;
 
+
 /**
  * All of the static methods in this class are given the exact same parameters for
  * consistency. You can often ignore some of these parameters when implementing your
