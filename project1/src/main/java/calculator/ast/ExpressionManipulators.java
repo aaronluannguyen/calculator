@@ -156,9 +156,8 @@ public class ExpressionManipulators {
         } else if (variables.containsKey(node.getName())){
             if (!variables.get(node.getName()).isNumber()) {
                 return toSimplifyHelper(env, variables.get(node.getName()));
-            } else {
-                return new AstNode(variables.get(node.getName()).getNumericValue());
-            }
+            } 
+            return new AstNode(variables.get(node.getName()).getNumericValue());
         } else {
             return node;
         }
