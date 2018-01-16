@@ -52,6 +52,10 @@ public class ExpressionManipulators {
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
+            
+            if (!variables.get(node.getName()).isNumber()) {
+                return toDoubleHelper(variables, variables.get(node.getName()));
+            }
             return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
@@ -150,9 +154,11 @@ public class ExpressionManipulators {
         } else if (node.isNumber()) {
             return node;
         } else if (variables.containsKey(node.getName())){
-            return new AstNode(node.getNumericValue());
-            // node = new AstNode(toDoubleHelper(variables, node));
-            // return node;
+            if (!variables.get(node.getName()).isNumber()) {
+                return toSimplifyHelper(env, variables.get(node.getName()));
+            } else {
+                return new AstNode(variables.get(node.getName()).getNumericValue());
+            }
         } else {
             return node;
         }
