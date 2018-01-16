@@ -52,6 +52,10 @@ public class ExpressionManipulators {
             if (!variables.containsKey(node.getName())) {
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
+            
+            if(!variables.get(node.getName()).isNumber()) {
+                return toDoubleHelper(variables, variables.get(node.getName()));
+            }
             return variables.get(node.getName()).getNumericValue();
         } else {
             String name = node.getName();
@@ -115,23 +119,54 @@ public class ExpressionManipulators {
         //         to call your "handleToDouble" method in some way
 
         // TODO: Your code here
-        return toSimplifyHelper(env.getVariables(), node.getChildren().get(0));
+
+        return toSimplifyHelper(env, node.getChildren().get(0));
     }
     
-    private static AstNode toSimplifyHelper(IDictionary<String, AstNode> variables, AstNode node) {
-        
-        if (node.isOperation()) {
+
+        // MY COMMENTS
+        // HANDLETODOUBLE IS GOING TO CHILD 0 AND FUCKING OUR CODE
+        // RETURN THE TOP MOST NODE (SIMPLIFY FUNCTION)
+        // DO ALL SIMPLIFICATION ON CHILD!
+    
+    private static AstNode toSimplifyHelper(Environment env, AstNode node) {
+        IDictionary<String, AstNode> variables = env.getVariables();
+        if (node.isOperation()) { 
             String name = node.getName();
-            if (name.equals("negates") || name.equals("^") || name.equals("/") || name.equals("cos")||
-                    name.equals("sin")) {
-                node.getChildren().set(0, toSimplifyHelper(variables, node.getChildren().get(0)));
+            if (name.equals("+") || name.equals("*") || name.equals("-")) {
+                if ((node.getChildren().get(0).isNumber() || 
+                        variables.containsKey(node.getChildren().get(0).getName())) &&
+                        (node.getChildren().get(1).isNumber() || 
+                        variables.containsKey(node.getChildren().get(1).getName()))) {
+                    node = new AstNode(toDoubleHelper(variables, node));
+                    return node;
+                } else {
+                    node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                    node.getChildren().set(1, toSimplifyHelper(env, node.getChildren().get(1)));
+                    return node;
+                }
+            } else if (node.getChildren().size() == 1) {
+                node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                return node;
+            } else {
+                node.getChildren().set(0, toSimplifyHelper(env, node.getChildren().get(0)));
+                node.getChildren().set(1, toSimplifyHelper(env, node.getChildren().get(1)));
                 return node;
             }
+        } else if (node.isNumber()) {
+            return node;
+        } else if (variables.containsKey(node.getName())){
+            if (!variables.get(node.getName()).isNumber()) {
+                return toSimplifyHelper(env, variables.get(node.getName()));
+            }
+            return new AstNode(variables.get(node.getName()).getNumericValue());
+            // node = new AstNode(toDoubleHelper(variables, node));
+            // return node;
+        } else {
+            return node;
         }
-        return null;
     }
-    
-    
+        
     /**
      * Accepts a 'plot(exprToPlot, var, varMin, varMax, step)' AstNode and
      * generates the corresponding plot. Returns some arbitrary AstNode.
