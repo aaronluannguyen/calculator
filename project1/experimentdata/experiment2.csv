@@ -1,4 +1,4 @@
-InputListSize,Test1Results,Test2Results,Test3Results
+InputListSize,Test 1 Time Results (get method),Test 2 Time Results (list.iterator()),Test 3 Time Results (for each loop)
 0,0,0,0
 100,0,0,0
 200,0,0,0

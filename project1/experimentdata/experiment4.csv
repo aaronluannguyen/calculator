@@ -1,4 +1,4 @@
-InputListSize,ResultsTest1,ResultsTest2
+InputListSize,Test 1 List Memory Used (bytes),Test 2 List Memory Used (bytes)
 0,24,64
 100,4824,5504
 200,9624,10944
