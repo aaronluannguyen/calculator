@@ -662,4 +662,24 @@ public class TestDoubleLinkedList extends BaseTest {
         }
         assertEquals(0, list.size());
     }
+    
+    @Test(timeout=SECOND) 
+    public void testDeleteNodeRepairLogic() {
+        IList<String> list = makeBasicList();
+        list.delete(1);
+        assertListMatches(new String[] {"a", "c"}, list);
+    }
+    
+    @Test(timeout=SECOND)
+    public void testBackFieldRepairLogic() {
+        IList<String> list = makeBasicList();
+        list.delete(2);
+        assertListMatches(new String[] {"a", "b"}, list);
+    }
+    
+    @Test(timeout=SECOND) 
+    public void testIncorrectReturnValue() {
+        IList<String> list = makeBasicList();
+        assertEquals("b", list.delete(1).toString());
+    }
 }
